@@ -28,7 +28,10 @@ namespace HangFireTaskScheduler
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,IBackgroundJobClient backgroundJobClient)
+        public void Configure(IApplicationBuilder app, 
+            IWebHostEnvironment env,
+            IBackgroundJobClient backgroundJobClient, 
+            IRecurringJobManager recurringJobManager)
         {
             if (env.IsDevelopment())
             {
@@ -47,6 +50,8 @@ namespace HangFireTaskScheduler
 
             app.UseHangfireDashboard();
             backgroundJobClient.Enqueue(() => Console.WriteLine("This is My First Hang Fire Job!!"));
+
+            recurringJobManager.AddOrUpdate("Run Every Minute", () => Console.WriteLine("Test Requiring Job"), "* * * * *");
         }
     }
 }
