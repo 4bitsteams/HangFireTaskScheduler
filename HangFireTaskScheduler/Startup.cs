@@ -23,7 +23,7 @@ namespace HangFireTaskScheduler
             .UseSimpleAssemblyNameTypeSerializer()
             .UseDefaultTypeSerializer()
             .UseMemoryStorage());
-
+            services.AddSingleton<IPrintJob, PrintJob>();
             services.AddHangfireServer();
         }
 
@@ -31,7 +31,7 @@ namespace HangFireTaskScheduler
         public void Configure(IApplicationBuilder app, 
             IWebHostEnvironment env,
             IBackgroundJobClient backgroundJobClient, 
-            IRecurringJobManager recurringJobManager)
+            IRecurringJobManager recurringJobManager,IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -51,7 +51,8 @@ namespace HangFireTaskScheduler
             app.UseHangfireDashboard();
             backgroundJobClient.Enqueue(() => Console.WriteLine("This is My First Hang Fire Job!!"));
 
-            recurringJobManager.AddOrUpdate("Run Every Minute", () => Console.WriteLine("Test Requiring Job"), "* * * * *");
+            recurringJobManager.AddOrUpdate("Run Every Minute", () 
+                => serviceProvider.GetService<IPrintJob>().Print(), "* * * * *");
         }
     }
 }
